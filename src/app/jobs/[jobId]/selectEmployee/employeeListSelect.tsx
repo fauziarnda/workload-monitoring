@@ -1,7 +1,7 @@
 'use client';
 
 import { organicEmployees } from '@/dummyData/organicEmp';
-import { mitraEmployees, MitraEmployee } from '@/dummyData/mitraEmp';
+import { mitraColumns, mitraEmployeesData } from '@/dummyData/mitraEmp';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,23 +14,24 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import DataTable from '@/components/data-table';
 
-interface MitraRowProps {
-  emp: MitraEmployee;
-  index: number;
-}
+// interface MitraRowProps {
+//   emp: MitraEmployee;
+//   index: number;
+// }
 
-const MitraRow: React.FC<MitraRowProps> = ({ emp, index }) => {
-  return (
-    <tr>
-      <td className="border px-4 py-2">{index + 1}</td>
-      <td className="border px-4 py-2">{emp.nama}</td>
-      <td className="border px-4 py-2">{emp.daerahAsal}</td>
-      <td className="border px-4 py-2">{emp.jenisEmployee}</td>
-      <td className="border px-4 py-2">{emp.pengalaman.join(', ')}</td>
-    </tr>
-  );
-};
+// const MitraRow: React.FC<MitraRowProps> = ({ emp, index }) => {
+//   return (
+//     <tr>
+//       <td className="border px-4 py-2">{index + 1}</td>
+//       <td className="border px-4 py-2">{emp.nama}</td>
+//       <td className="border px-4 py-2">{emp.daerahAsal}</td>
+//       <td className="border px-4 py-2">{emp.jenisEmployee}</td>
+//       <td className="border px-4 py-2">{emp.pengalaman.join(', ')}</td>
+//     </tr>
+//   );
+// };
 
 export default function EmployeeListSelect() {
   const [selectedView, setSelectedView] = useState('organik');
@@ -146,24 +147,7 @@ export default function EmployeeListSelect() {
             </CardContent>
           ) : (
             <CardContent className="p-0">
-              <table className="w-full border-collapse border">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border px-4 py-2 text-left">#</th>
-                    <th className="border px-4 py-2 text-left">Nama</th>
-                    <th className="border px-4 py-2 text-left">Daerah Asal</th>
-                    <th className="border px-4 py-2 text-left">
-                      Jenis Employee
-                    </th>
-                    <th className="border px-4 py-2 text-left">Pengalaman</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mitraEmployees.map((emp, index) => (
-                    <MitraRow key={emp.id} emp={emp} index={index} />
-                  ))}
-                </tbody>
-              </table>
+              <DataTable columns={mitraColumns} data={mitraEmployeesData} />
             </CardContent>
           )}
         </Card>

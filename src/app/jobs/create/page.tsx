@@ -92,7 +92,7 @@ export default function CreateJobForm() {
         </div>
 
         {/* container form isi sisa tinggi */}
-        <Card className="w-full  ">
+        <Card className="w-full flex-1">
           <CardContent className="flex flex-col p-6">
             <form onSubmit={handleFirstSubmit} className="flex flex-col gap-4">
               <div>

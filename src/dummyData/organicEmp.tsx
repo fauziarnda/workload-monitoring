@@ -3,7 +3,7 @@ export interface OrganicAttribute {
   name: string;
   email: string;
   department: string;
-  status: string;
+  status: 'Available' | 'On Duty';
 }
 
 export const organicEmployees: OrganicAttribute[] = [

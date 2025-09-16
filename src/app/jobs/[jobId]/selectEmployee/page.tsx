@@ -2,7 +2,6 @@ import EmployeeListSelect from '@/app/jobs/[jobId]/selectEmployee/employeeListSe
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronDown } from 'lucide-react';
-
 export default function selectEmployee() {
   return (
     <div className="flex flex-col min-h-screen">
