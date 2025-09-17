@@ -9,6 +9,15 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from './ui/button';
 
@@ -47,6 +56,14 @@ export default function DataTable<T extends { id: string }>({
   }
   return (
     <div className="overflow-hidden rounded-md border">
+      {/* employee terpilih */}
+      <div className="flex items-center gap-2">
+        <div className="text-sm">{selectedCount} terpilih</div>
+        <Button variant="outline" size="sm" onClick={() => setSelected({})}>
+          Clear
+        </Button>
+      </div>
+      {/* datatabel */}
       <Table className="">
         <TableHeader>
           <TableRow className="bg-neutral-500 hover:!bg-none text-white">
@@ -98,9 +115,41 @@ export default function DataTable<T extends { id: string }>({
                 ))}
 
                 <TableCell>
-                  <Button variant="link" className="p-0">
-                    See Detail
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation(); // biar tidak trigger row click
+                        }}
+                        variant="link"
+                        className="p-0"
+                      >
+                        See Detail
+                      </Button>
+                    </DialogTrigger>
+
+                    <DialogContent className="flex flex-col sm:max-w-lg items-center justify-center text-center">
+                      <DialogHeader className="flex flex-col justify-center text-center">
+                        <DialogTitle>Personal Informastion</DialogTitle>
+                        <DialogDescription>
+                          Detail dari employee
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <Avatar className="w-24 h-24 rounded-md border">
+                        <AvatarImage src="#" alt="name" />
+                        <AvatarFallback className="rounded-md">
+                          A
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="mt-2 space-y-2">
+                        <p>Nama Pegawai : Lorem Ipsum Dolor</p>
+                        <p>Daerah Asal : Malang</p>
+                        <p>Pengalaman Kerja</p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </TableCell>
               </TableRow>
             );

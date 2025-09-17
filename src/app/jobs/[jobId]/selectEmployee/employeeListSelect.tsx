@@ -2,7 +2,7 @@
 
 import { organicEmployees } from '@/dummyData/organicEmp';
 import { mitraColumns, mitraEmployeesData } from '@/dummyData/mitraEmp';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -15,29 +15,38 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import DataTable from '@/components/data-table';
-
-// interface MitraRowProps {
-//   emp: MitraEmployee;
-//   index: number;
-// }
-
-// const MitraRow: React.FC<MitraRowProps> = ({ emp, index }) => {
-//   return (
-//     <tr>
-//       <td className="border px-4 py-2">{index + 1}</td>
-//       <td className="border px-4 py-2">{emp.nama}</td>
-//       <td className="border px-4 py-2">{emp.daerahAsal}</td>
-//       <td className="border px-4 py-2">{emp.jenisEmployee}</td>
-//       <td className="border px-4 py-2">{emp.pengalaman.join(', ')}</td>
-//     </tr>
-//   );
-// };
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 export default function EmployeeListSelect() {
   const [selectedView, setSelectedView] = useState('organik');
-  const [selectedEmp, setSelectedEmp] = useState<number[]>([]);
+  const [selectedEmp, setSelectedEmp] = useState<string[]>([]);
+  const [selectedMitra, setSelectedMitra] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  const toggleSelect = (id: number) => {
+  const selectedCount = Object.values(selectedMitra).filter(Boolean).length;
+  const selectedEmployee = selectedEmp.length > 0 || selectedCount > 0;
+
+  function toggleSelectMitra(id: string) {
+    setSelectedMitra((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  const toggleSelect = (id: string) => {
     setSelectedEmp((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
@@ -55,7 +64,10 @@ export default function EmployeeListSelect() {
           {/* Filter */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="h-10 px-6 text-base">
+              <Button
+                variant="outline"
+                className="h-11 border-2 rounded-lg px-6 text-base"
+              >
                 Filter
                 <ChevronDown />
               </Button>
@@ -71,12 +83,21 @@ export default function EmployeeListSelect() {
               </div>
             </PopoverContent>
           </Popover>
+
           {/* Toggle View */}
           <div className="border-2 rounded-lg w-fit">
             <ToggleGroup
               type="single"
-              defaultValue={selectedView}
-              onValueChange={setSelectedView}
+              value={selectedView}
+              onValueChange={(value) => {
+                if (value) {
+                  setSelectedView(value);
+                } else {
+                  setSelectedView(
+                    selectedView === 'organik' ? 'mitra' : 'organik'
+                  );
+                }
+              }}
             >
               <ToggleGroupItem
                 value="organik"
@@ -84,6 +105,7 @@ export default function EmployeeListSelect() {
               >
                 Organik
               </ToggleGroupItem>
+
               <ToggleGroupItem
                 value="mitra"
                 className="h-10 px-6 text-base data-[state=on]:bg-primary data-[state=on]:text-white"
@@ -147,21 +169,140 @@ export default function EmployeeListSelect() {
             </CardContent>
           ) : (
             <CardContent className="p-0">
-              <DataTable columns={mitraColumns} data={mitraEmployeesData} />
+              <Table className="overflow-hidden rounded-md">
+                <TableHeader>
+                  <TableRow className="bg-neutral-500 hover:!bg-none text-white">
+                    <TableHead className="text-white font-semibold">
+                      Checkbox
+                    </TableHead>
+                    {mitraColumns.map((col) => (
+                      <TableHead
+                        key={String(col.key)}
+                        className="text-white font-semibold"
+                      >
+                        {col.label}
+                      </TableHead>
+                    ))}
+                    <TableHead className="text-white">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {mitraEmployeesData.map((row) => {
+                    const isSelected = !!selectedMitra[row.id];
+                    return (
+                      <TableRow
+                        key={row.id}
+                        className={`cursor-pointer hover:bg-muted/50 transition-colors ${
+                          isSelected ? 'bg-muted/70' : ''
+                        }`}
+                        onClick={() => toggleSelectMitra(row.id)}
+                        role="row"
+                        aria-selected={isSelected}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleSelectMitra(row.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Pilih ${row.id}`}
+                          />
+                        </TableCell>
+                        {mitraColumns.map((col) => (
+                          <TableCell key={String(col.key)}>
+                            {String(row[col.key])}
+                          </TableCell>
+                        ))}
+
+                        <TableCell>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                variant="link"
+                                className="p-0"
+                              >
+                                See Detail
+                              </Button>
+                            </DialogTrigger>
+
+                            <DialogContent className="flex flex-col sm:max-w-lg items-center justify-center text-center">
+                              <DialogHeader className="flex flex-col justify-center text-center">
+                                <DialogTitle>Personal Informastion</DialogTitle>
+                                <DialogDescription>
+                                  Detail dari employee
+                                </DialogDescription>
+                              </DialogHeader>
+
+                              <Avatar className="w-24 h-24 rounded-md border">
+                                <AvatarImage src="#" alt="name" />
+                                <AvatarFallback className="rounded-md">
+                                  A
+                                </AvatarFallback>
+                              </Avatar>
+
+                              <div className="mt-2 space-y-2">
+                                <p>Nama Pegawai : Lorem Ipsum Dolor</p>
+                                <p>Daerah Asal : Malang</p>
+                                <p>Pengalaman Kerja</p>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </CardContent>
           )}
         </Card>
 
-        {selectedEmp.length > 0 && (
-          <Card className="max-w-md w-full p-4">
-            <h3 className="font-semibold mb-2">Employee Terpilih:</h3>
-            <ul className="list-disc ml-5">
-              {organicEmployees
-                .filter((emp) => selectedEmp.includes(emp.id))
-                .map((emp) => (
-                  <li key={emp.id}>{emp.name}</li>
-                ))}
-            </ul>
+        {selectedEmployee && (
+          <Card className="max-w-md w-full p-4 gap-12">
+            <CardHeader className="p-0">
+              <CardTitle className="text-xl font-semibold mb-2">
+                Employee Terpilih:
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="flex flex-col flex-1 p-0 gap-4">
+              <Card className="p-0">
+                <CardHeader className="p-4">
+                  <CardTitle className="">Organik Terpilih:</CardTitle>
+                </CardHeader>
+                <CardContent className="">
+                  {selectedEmp.length > 0 && (
+                    <ul className="list-disc ml-5">
+                      {organicEmployees
+                        .filter((emp) => selectedEmp.includes(emp.id))
+                        .map((emp) => (
+                          <li key={emp.id}>{emp.name}</li>
+                        ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="p-0">
+                <CardHeader className="p-4">
+                  <CardTitle className="">Mitra Terpilih:</CardTitle>
+                </CardHeader>
+                <CardContent className="">
+                  {selectedCount > 0 && (
+                    <ul className="list-disc ml-5">
+                      {mitraEmployeesData
+                        .filter((emp) => selectedMitra[emp.id]) // ✅ cek dari object
+                        .map((emp) => (
+                          <li key={emp.id}>{emp.nama}</li>
+                        ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+            </CardContent>
           </Card>
         )}
       </div>
