@@ -6,11 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
@@ -30,17 +25,28 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function EmployeeListSelect() {
   const router = useRouter();
   const { jobId } = useParams();
-
+  const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
+  const [openFilter, setOpenFilter] = useState(false);
   const [selectedView, setSelectedView] = useState('organik');
   const [selectedEmp, setSelectedEmp] = useState<string[]>([]);
   const [selectedMitra, setSelectedMitra] = useState<Record<string, boolean>>(
     {}
   );
+
+  const filterOption = ['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'];
 
   const selectedCount = Object.values(selectedMitra).filter(Boolean).length;
   const selectedEmployee = selectedEmp.length > 0 || selectedCount > 0;
@@ -84,78 +90,110 @@ export default function EmployeeListSelect() {
         </div>
 
         <div className="flex flex-row gap-2 items-center">
-          {/* Filter */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-11 border-2 rounded-lg px-6 text-base"
-              >
-                Filter
+          <DropdownMenu
+            open={openFilter}
+            onOpenChange={(o) => {
+              setOpenFilter(o);
+              if (!o) {
+                console.log('Filter applied:', selectedFilter);
+              }
+            }}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-10 border-2 rounded-md">
+                Filter by experience
                 <ChevronDown />
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48">
-              <div className="flex flex-col gap-2">
-                {['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'].map((option) => (
-                  <label key={option} className="flex items-center gap-2">
-                    <Checkbox />
-                    <span>{option}</span>
-                  </label>
-                ))}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel>Experience</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {filterOption.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option}
+                  checked={selectedFilter.includes(option)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedFilter([...selectedFilter, option]);
+                    } else {
+                      setSelectedFilter(
+                        selectedFilter.filter((o) => o !== option)
+                      );
+                    }
+                  }}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {option}
+                </DropdownMenuCheckboxItem>
+              ))}
+
+              <DropdownMenuSeparator />
+              <div className="p-2">
+                <Button
+                  size="sm"
+                  className="w-full bg-blue-950"
+                  onClick={() => {
+                    console.log('Filter applied:', selectedFilter);
+                    setOpenFilter(false);
+                  }}
+                >
+                  Apply
+                </Button>
               </div>
-            </PopoverContent>
-          </Popover>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-          {/* Toggle View */}
-          <div className="border-2 rounded-lg w-fit">
-            <ToggleGroup
-              type="single"
-              value={selectedView}
-              onValueChange={(value) => {
-                if (value) {
-                  setSelectedView(value);
-                } else {
-                  setSelectedView(
-                    selectedView === 'organik' ? 'mitra' : 'organik'
-                  );
-                }
-              }}
+          <ToggleGroup
+            className="border-2 h-10 rounded-md overflow-hidden items-center "
+            type="single"
+            value={selectedView}
+            onValueChange={(value) => {
+              if (value) {
+                setSelectedView(value);
+              } else {
+                setSelectedView(
+                  selectedView === 'organik' ? 'mitra' : 'organik'
+                );
+              }
+            }}
+          >
+            <ToggleGroupItem
+              value="organik"
+              className="px-6 rounded-sm text-base data-[state=on]:bg-blue-950 data-[state=on]:text-white"
             >
-              <ToggleGroupItem
-                value="organik"
-                className="h-10 px-6 text-base data-[state=on]:bg-primary data-[state=on]:text-white"
-              >
-                Organik
-              </ToggleGroupItem>
+              Organik
+            </ToggleGroupItem>
 
-              <ToggleGroupItem
-                value="mitra"
-                className="h-10 px-6 text-base data-[state=on]:bg-primary data-[state=on]:text-white"
-              >
-                Mitra
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
+            <ToggleGroupItem
+              value="mitra"
+              className="px-6 rounded-sm text-base data-[state=on]:bg-blue-950 data-[state=on]:text-white"
+            >
+              Mitra
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </div>
 
       <div className="flex flex-row flex-1 gap-4 ">
         <Card className="flex flex-1 flex-col p-4 overflow-y-auto">
           {selectedView === 'organik' ? (
-            <CardContent className="grid grid-cols-3 gap-2 p-0 w-full">
+            <CardContent
+              className={`grid gap-2 p-0 w-full ${
+                selectedEmployee ? 'grid-cols-2' : 'grid-cols-3'
+              }`}
+            >
               {organicEmployees.map((emp) => {
                 const isSelected = selectedEmp.includes(emp.id);
                 return (
                   <Card
                     key={emp.id}
                     onClick={() => toggleSelect(emp.id)}
-                    className={`flex flex-row w-full items-center p-4 gap-4 h-fit cursor-pointer transition  ${
+                    className={`flex flex-row w-full items-center p-3 gap-4 cursor-pointer transition  ${
                       isSelected ? 'border-2 border-blue-300 bg-blue-50' : ''
                     }`}
                   >
                     <CardHeader className="p-0">
-                      <Avatar className="w-24 h-24 rounded-md border">
+                      <Avatar className="w-20 h-20 rounded-md border">
                         <AvatarImage src="#" alt={emp.name} />
                         <AvatarFallback className="rounded-md">
                           {emp.name[0]}
@@ -171,11 +209,11 @@ export default function EmployeeListSelect() {
                         </div>
 
                         <div className="flex gap-2">
-                          <p className="text-sm text-white py-[2px] px-2 rounded-md bg-blue-400 w-fit">
+                          <p className="text-xs text-white py-[2px] px-2 rounded-md bg-blue-400 w-fit">
                             {emp.department}
                           </p>
                           <p
-                            className={`text-sm text-white py-[2px] px-2 rounded-md bg-green-500 w-fit ${
+                            className={`text-xs text-white py-[2px] px-2 rounded-md bg-green-500 w-fit ${
                               emp.status === 'Available'
                                 ? 'bg-green-500'
                                 : 'bg-red-500'
@@ -194,7 +232,7 @@ export default function EmployeeListSelect() {
             <CardContent className="p-0">
               <Table className="overflow-hidden rounded-md">
                 <TableHeader>
-                  <TableRow className="bg-neutral-500 hover:!bg-none text-white">
+                  <TableRow className="bg-blue-950 hover:!bg-none text-white">
                     <TableHead className="text-white font-semibold">
                       Checkbox
                     </TableHead>
@@ -295,14 +333,19 @@ export default function EmployeeListSelect() {
           )}
 
           <CardHeader className="px-0 items-end pb-0">
-            <Button onClick={handleSubmit} type="submit" size="lg" className="">
+            <Button
+              onClick={handleSubmit}
+              type="submit"
+              size="lg"
+              className="bg-blue-950"
+            >
               Submit
             </Button>
           </CardHeader>
         </Card>
 
         {selectedEmployee && (
-          <Card className="max-w-md w-full p-4 gap-12">
+          <Card className="relative overflow-hidden max-w-sm w-full p-4 space-y-6">
             <CardHeader className="p-0">
               <CardTitle className="text-xl font-semibold mb-2">
                 Employee Terpilih:
@@ -310,12 +353,12 @@ export default function EmployeeListSelect() {
             </CardHeader>
 
             <CardContent className="flex flex-col flex-1 p-0 gap-4">
-              <Card className="p-0">
+              <Card className="p-0 min-h-64">
                 <CardHeader className="p-4">
                   <CardTitle className="">Organik Terpilih:</CardTitle>
                 </CardHeader>
-                <CardContent className="">
-                  {selectedEmp.length > 0 && (
+                <CardContent className="px-4">
+                  {selectedEmp.length > 0 ? (
                     <ul className="list-disc ml-5">
                       {organicEmployees
                         .filter((emp) => selectedEmp.includes(emp.id))
@@ -323,16 +366,20 @@ export default function EmployeeListSelect() {
                           <li key={emp.id}>{emp.name}</li>
                         ))}
                     </ul>
+                  ) : (
+                    <div className="p-16 h-full text-center justify-center text-neutral-400">
+                      There&apos;s no employee selected
+                    </div>
                   )}
                 </CardContent>
               </Card>
 
-              <Card className="p-0">
+              <Card className="p-0 min-h-64">
                 <CardHeader className="p-4">
-                  <CardTitle className="">Mitra Terpilih:</CardTitle>
+                  <CardTitle className="">Mitra Terpilih :</CardTitle>
                 </CardHeader>
-                <CardContent className="">
-                  {selectedCount > 0 && (
+                <CardContent className="px-4">
+                  {selectedCount > 0 ? (
                     <ul className="list-disc ml-5">
                       {mitraEmployeesData
                         .filter((emp) => selectedMitra[emp.id]) // ✅ cek dari object
@@ -340,10 +387,15 @@ export default function EmployeeListSelect() {
                           <li key={emp.id}>{emp.nama}</li>
                         ))}
                     </ul>
+                  ) : (
+                    <div className="p-16 h-full text-center justify-center text-neutral-400">
+                      There&apos;s no employee selected
+                    </div>
                   )}
                 </CardContent>
               </Card>
             </CardContent>
+            <div className="absolute bottom-0 left-8 -rotate-45 w-[150%] h-[20%] bg-blue-950 translate-y-10 "></div>
           </Card>
         )}
       </div>
