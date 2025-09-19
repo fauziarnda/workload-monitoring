@@ -1,16 +1,28 @@
+'use client';
+
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Plus, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Header from '@/components/headernav';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import * as React from 'react';
+import { useState } from 'react';
 
 export default function TeamLeadDashboard() {
+  const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
+  const [openFilter, setOpenFilter] = useState(false);
+
+  const filterOption = ['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'];
+
   return (
     <div className="flex flex-col min-h-screen bg-neutral-50 ">
       <Header className=" " />
@@ -23,16 +35,14 @@ export default function TeamLeadDashboard() {
               lorem ipsum dolor sit amet
             </p>
           </div>
-
-          <Button size="lg" className="bg-blue-950">
-            <Link
-              href="/jobs/create"
-              className="flex items-center gap-2 h-full"
-            >
-              <Plus />
-              Create new job
-            </Link>
-          </Button>
+          <div>
+            <Button size="lg" className="bg-blue-950">
+              <Link href="/jobs/create" className="flex items-center gap-2">
+                <Plus />
+                Create new job
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-row gap-4">
@@ -64,27 +74,67 @@ export default function TeamLeadDashboard() {
         {/* table list */}
 
         <Card className="flex flex-col flex-1 overflow-y-auto">
-          <CardHeader className="flex flex-row justify-between items-center">
-            <h3 className="text-2xl font-bold">Job List</h3>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline">
-                  Filter
-                  <ChevronDown />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-48">
-                <div className="flex flex-col gap-2">
-                  {['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'].map((option) => (
-                    <label key={option} className="flex items-center gap-2">
-                      <Checkbox />
-                      <span>{option}</span>
-                    </label>
+          <CardHeader>
+            <div className="flex flex-row justify-between items-center">
+              <h3 className="text-2xl font-bold leading-normal">
+                Daftar Pekerjaan
+              </h3>
+
+              <DropdownMenu
+                open={openFilter}
+                onOpenChange={(o) => {
+                  setOpenFilter(o);
+                  if (!o) {
+                    console.log('Filter applied:', selectedFilter);
+                  }
+                }}
+              >
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    Filter by experience
+                    <ChevronDown />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuLabel>Experience</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {filterOption.map((option) => (
+                    <DropdownMenuCheckboxItem
+                      key={option}
+                      checked={selectedFilter.includes(option)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedFilter([...selectedFilter, option]);
+                        } else {
+                          setSelectedFilter(
+                            selectedFilter.filter((o) => o !== option)
+                          );
+                        }
+                      }}
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      {option}
+                    </DropdownMenuCheckboxItem>
                   ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+
+                  <DropdownMenuSeparator />
+                  <div className="p-2">
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        console.log('Filter applied:', selectedFilter);
+                        setOpenFilter(false);
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </CardHeader>
+
           <CardContent className="py-0">
             <div className="rounded-md overflow-hidden">
               <table className="w-full text-sm rounded-md">
