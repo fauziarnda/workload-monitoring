@@ -13,10 +13,8 @@ import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 
@@ -45,6 +43,7 @@ export default function CreateJobForm() {
 
     const isSuccess = true;
     if (isSuccess) {
+      localStorage.setItem('jobData', JSON.stringify(jobData));
       setNewJobId(dummyJobId);
       setOpenAlert(true);
     }
@@ -182,11 +181,6 @@ export default function CreateJobForm() {
         <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
           <AlertDialogContent className="">
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2 items-center ">
                   <CheckCircle className="text-brand-primary w-6 h-6" />

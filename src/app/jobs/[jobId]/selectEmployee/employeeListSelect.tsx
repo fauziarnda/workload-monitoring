@@ -14,7 +14,6 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import DataTable from '@/components/data-table';
 import {
   Table,
   TableHeader,
@@ -31,8 +30,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function EmployeeListSelect() {
+  const router = useRouter();
+  const { jobId } = useParams();
+
   const [selectedView, setSelectedView] = useState('organik');
   const [selectedEmp, setSelectedEmp] = useState<string[]>([]);
   const [selectedMitra, setSelectedMitra] = useState<Record<string, boolean>>(
@@ -50,6 +53,26 @@ export default function EmployeeListSelect() {
     setSelectedEmp((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+  };
+
+  const handleSubmit = () => {
+    // ambil data organik & mitra yang kepilih
+    const selectedOrganik = organicEmployees.filter((emp) =>
+      selectedEmp.includes(emp.id)
+    );
+
+    const selectedMitraList = mitraEmployeesData.filter(
+      (emp) => selectedMitra[emp.id]
+    );
+
+    // simpan ke localStorage
+    localStorage.setItem(
+      'selectedEmployees',
+      JSON.stringify({ organik: selectedOrganik, mitra: selectedMitraList })
+    );
+
+    // redirect ke halaman finalisasi
+    router.push(`/jobs/${jobId}/finalization`);
   };
 
   return (
@@ -210,7 +233,19 @@ export default function EmployeeListSelect() {
                         </TableCell>
                         {mitraColumns.map((col) => (
                           <TableCell key={String(col.key)}>
-                            {String(row[col.key])}
+                            {col.key === 'img' ? (
+                              <Avatar>
+                                <AvatarImage
+                                  src={String(row[col.key])}
+                                  alt={row.nama}
+                                />
+                                <AvatarFallback className="bg-neutral-300">
+                                  {row.nama[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              String(row[col.key])
+                            )}
                           </TableCell>
                         ))}
 
@@ -258,6 +293,12 @@ export default function EmployeeListSelect() {
               </Table>
             </CardContent>
           )}
+
+          <CardHeader className="px-0 items-end pb-0">
+            <Button onClick={handleSubmit} type="submit" size="lg" className="">
+              Submit
+            </Button>
+          </CardHeader>
         </Card>
 
         {selectedEmployee && (
