@@ -164,8 +164,8 @@ export default function CreateJobForm() {
             <AlertDialogHeader>
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2 items-center ">
-                  <CheckCircle className="text-brand-primary w-6 h-6" />
-                  <h4 className="text-2xl font-bold text-brand-primary">
+                  <CheckCircle className="text-brand-primary w-6 h-6 text-blue-950" />
+                  <h4 className="text-2xl font-bold text-brand-primary text-blue-950">
                     Success
                   </h4>
                 </div>
@@ -176,8 +176,11 @@ export default function CreateJobForm() {
             </AlertDialogHeader>
 
             <AlertDialogFooter>
-              <AlertDialogAction onClick={handleNavigateToNextStep}>
-                OK
+              <AlertDialogAction
+                onClick={handleNavigateToNextStep}
+                className="bg-blue-950 "
+              >
+                Ok
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
