@@ -25,7 +25,7 @@ export default function TeamLeadDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-neutral-50 ">
-      <Header className=" " />
+      <Header />
 
       <main className="flex flex-col flex-1 p-4 gap-4 px-[80px]">
         <div className="flex justify-between items-end">

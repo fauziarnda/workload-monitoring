@@ -4,9 +4,7 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CheckCircle, ChevronDown } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import {
@@ -17,6 +15,7 @@ import {
   AlertDialogHeader,
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
+import Header from '@/components/headernav';
 
 export default function CreateJobForm() {
   const router = useRouter();
@@ -59,29 +58,10 @@ export default function CreateJobForm() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen ">
-      <header className="flex justify-between border-b items-start p-4">
-        <div>
-          <h1 className="text-2xl font-bold">Hello Team Leader</h1>
-          <p>lorem ipsum dolor sit amet</p>
-        </div>
+    <div className="flex flex-col min-h-screen bg-neutral-50 ">
+      <Header />
 
-        <Card className="flex py-2 px-4 gap-2 items-center">
-          <Avatar className="w-[36px] h-[36px] rounded-full border">
-            <AvatarImage src="#" alt="avatar" />
-            <AvatarFallback>TS</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="truncate font-medium text-base">
-              Tejo Sutrisno
-            </span>
-            <span className="truncate text-xs">tejo@example.com</span>
-          </div>
-          <ChevronDown />
-        </Card>
-      </header>
-
-      <main className="flex flex-col flex-1 p-4 gap-4 overflow-hidden">
+      <main className="flex flex-col flex-1 p-4 px-[80px] gap-4 overflow-hidden">
         <div>
           <h3 className="text-2xl font-bold">Create Job Form</h3>
           <p>
@@ -91,7 +71,7 @@ export default function CreateJobForm() {
         </div>
 
         {/* container form isi sisa tinggi */}
-        <Card className="w-full flex-1">
+        <Card className="relative w-full flex-1 overflow-hidden">
           <CardContent className="flex flex-col p-6">
             <form onSubmit={handleFirstSubmit} className="flex flex-col gap-4">
               <div>
@@ -170,12 +150,13 @@ export default function CreateJobForm() {
                 />
               </div>
               <CardHeader className="px-0 items-end pb-0">
-                <Button type="submit" size="lg" className="">
+                <Button type="submit" size="lg" className="bg-blue-950">
                   Submit
                 </Button>
               </CardHeader>
             </form>
           </CardContent>
+          <div className="absolute -bottom-0  w-[100%] h-[5%] bg-blue-950 "></div>
         </Card>
 
         <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
