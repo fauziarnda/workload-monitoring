@@ -83,10 +83,14 @@ export default function EmployeeListSelect() {
 
   return (
     <div className="flex flex-col flex-1 gap-4 ">
-      <div className="flex flex-row justify-between items-center">
+      <div className="flex flex-row justify-between items-end">
         <div>
-          <h3 className="text-2xl font-bold">Select Your Employee</h3>
-          <p className="text-sm font-normal">choose your employee for job</p>
+          <h3 className="flex items-center gap-3 text-3xl font-bold text-white">
+            Select Your Employee
+          </h3>
+          <p className="text-base text-neutral-200">
+            choose your employee for job
+          </p>
         </div>
 
         <div className="flex flex-row gap-2 items-center">
@@ -100,7 +104,10 @@ export default function EmployeeListSelect() {
             }}
           >
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-10 border-2 rounded-md">
+              <Button
+                variant="outline"
+                className="h-10 border-none rounded-md bg-brand-primary text-white"
+              >
                 Filter by experience
                 <ChevronDown />
               </Button>
@@ -144,7 +151,7 @@ export default function EmployeeListSelect() {
           </DropdownMenu>
 
           <ToggleGroup
-            className="border-2 h-10 rounded-md overflow-hidden items-center "
+            className="border-2 border-brand-primary bg-white h-10 rounded-md overflow-hidden items-center "
             type="single"
             value={selectedView}
             onValueChange={(value) => {
@@ -159,14 +166,14 @@ export default function EmployeeListSelect() {
           >
             <ToggleGroupItem
               value="organik"
-              className="px-6 rounded-sm text-base data-[state=on]:bg-blue-950 data-[state=on]:text-white"
+              className="px-6 rounded-sm text-base data-[state=on]:bg-brand-primary data-[state=on]:text-white"
             >
               Organik
             </ToggleGroupItem>
 
             <ToggleGroupItem
               value="mitra"
-              className="px-6 rounded-sm text-base data-[state=on]:bg-blue-950 data-[state=on]:text-white"
+              className="px-6 rounded-sm text-base data-[state=on]:bg-brand-primary data-[state=on]:text-white"
             >
               Mitra
             </ToggleGroupItem>
@@ -301,25 +308,38 @@ export default function EmployeeListSelect() {
                               </Button>
                             </DialogTrigger>
 
-                            <DialogContent className="flex flex-col sm:max-w-lg items-center justify-center text-center">
-                              <DialogHeader className="flex flex-col justify-center text-center">
+                            <DialogContent className="flex flex-col sm:max-w-lg p-2">
+                              <DialogHeader className="flex flex-col justify-center items-center ">
                                 <DialogTitle>Personal Informastion</DialogTitle>
                                 <DialogDescription>
                                   Detail dari employee
                                 </DialogDescription>
                               </DialogHeader>
-
-                              <Avatar className="w-24 h-24 rounded-md border">
+                              <Avatar className="flex flex-col max-w-32 w-full h-32 rounded-md border justify-center items-center self-center">
                                 <AvatarImage src="#" alt="name" />
                                 <AvatarFallback className="rounded-md">
                                   A
                                 </AvatarFallback>
                               </Avatar>
+                              <div className="flex flex-col gap-4 p-4 ">
+                                <div className="mt-2 space-y-2">
+                                  <p>NAMA : JOHN DOE</p>
+                                  <p>SOBAT ID : 012345678</p>
+                                  <p>USIA : 25</p>
+                                  <p>TANGGAL LAHIR : 01 JANUARI 1999</p>
 
-                              <div className="mt-2 space-y-2">
-                                <p>Nama Pegawai : Lorem Ipsum Dolor</p>
-                                <p>Daerah Asal : Malang</p>
-                                <p>Pengalaman Kerja</p>
+                                  <p>DAERAH ASAL : SUMBERSARI, LOWOKWARU</p>
+                                  <p>PENDIDIKAN TERAKHIR : S1</p>
+                                  <p className="flex gap-1">
+                                    PENGALAMAN :{' '}
+                                    <span className="px-2 py-0 bg-brand-secondary rounded-full">
+                                      SAKERNAS
+                                    </span>
+                                    <span className="px-2 py-0 bg-brand-secondary rounded-full">
+                                      SAKERNAS
+                                    </span>
+                                  </p>
+                                </div>
                               </div>
                             </DialogContent>
                           </Dialog>
@@ -332,7 +352,7 @@ export default function EmployeeListSelect() {
             </CardContent>
           )}
 
-          <CardHeader className="px-0 items-end pb-0">
+          <div className="flex flex-col items-end py-8">
             <Button
               onClick={handleSubmit}
               type="submit"
@@ -341,21 +361,24 @@ export default function EmployeeListSelect() {
             >
               Submit
             </Button>
-          </CardHeader>
+          </div>
         </Card>
 
         {selectedEmployee && (
           <Card className="relative overflow-hidden max-w-sm w-full p-4 space-y-6">
             <CardHeader className="p-0">
-              <CardTitle className="text-xl font-semibold mb-2">
+              <CardTitle className="text-xl font-semibold mb-2 flex flex-row justify-between ">
                 Employee Terpilih:
+                <Button size="sm" variant="outline">
+                  Clear All
+                </Button>
               </CardTitle>
             </CardHeader>
 
             <CardContent className="flex flex-col flex-1 p-0 gap-4">
               <Card className="p-0 min-h-64">
                 <CardHeader className="p-4">
-                  <CardTitle className="">Organik Terpilih:</CardTitle>
+                  <CardTitle className="">Organik Terpilih: </CardTitle>
                 </CardHeader>
                 <CardContent className="px-4">
                   {selectedEmp.length > 0 ? (

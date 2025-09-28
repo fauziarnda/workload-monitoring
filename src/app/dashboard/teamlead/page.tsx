@@ -1,10 +1,11 @@
 'use client';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Plus, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Header from '@/components/headernav';
+import { FaPlus } from 'react-icons/fa6';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -24,21 +25,26 @@ export default function TeamLeadDashboard() {
   const filterOption = ['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'];
 
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-50 ">
+    <div className="flex flex-col relative min-h-screen ">
       <Header />
 
-      <main className="flex flex-col flex-1 p-4 gap-4 px-[80px]">
+      <main className="flex flex-col flex-1 pt-4 pb-8 gap-4 px-[80px]">
         <div className="flex justify-between items-end">
           <div className="flex flex-col">
-            <h1 className="text-3xl font-bold">Hello Team Leader</h1>
-            <p className="text-base text-neutral-400">
+            <h1 className="flex items-center gap-3 text-3xl font-bold text-white">
+              Team Leader
+            </h1>
+            <p className="text-base text-neutral-200">
               lorem ipsum dolor sit amet
             </p>
           </div>
           <div>
-            <Button size="lg" className="bg-blue-950">
-              <Link href="/jobs/create" className="flex items-center gap-2">
-                <Plus />
+            <Button size="lg" className=" bg-brand-primary">
+              <Link
+                href="/jobs/create"
+                className="flex items-center gap-2 text-white"
+              >
+                <FaPlus />
                 Create new job
               </Link>
             </Button>
@@ -46,26 +52,30 @@ export default function TeamLeadDashboard() {
         </div>
 
         <div className="flex flex-row gap-4">
-          <Card className="w-full h-32 relative overflow-hidden">
-            <div className="absolute top-0 left-64 w-[100%] h-[100%] bg-blue-950 -rotate-45"></div>
+          <Card className="w-full h-32 relative overflow-hidden border-none">
+            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
+            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
+
             <CardContent className=" flex flex-col px-5 py-4 ">
-              <h3 className="text-2xl font-bold">23</h3>
+              <h3 className="text-4xl font-bold">23</h3>
               <p>Total Job</p>
             </CardContent>
           </Card>
 
-          <Card className="w-full h-32 relative overflow-hidden">
-            <div className="absolute top-0 left-64 w-[100%] h-[100%] bg-blue-950 -rotate-45"></div>
+          <Card className="w-full h-32 relative overflow-hidden border-none ">
+            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
+            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
             <CardContent className="flex flex-col px-5 py-4">
-              <h3 className="text-2xl font-bold">23</h3>
+              <h3 className="text-4xl font-bold">23</h3>
               <p>On Going Job</p>
             </CardContent>
           </Card>
 
-          <Card className="w-full h-32 relative overflow-hidden">
-            <div className="absolute top-0 left-64 w-[100%] h-[100%] bg-blue-950 -rotate-45"></div>
+          <Card className="w-full h-32 relative overflow-hidden border-none">
+            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
+            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
             <CardContent className="flex flex-col px-5 py-4">
-              <h3 className="text-2xl font-bold">23</h3>
+              <h3 className="text-4xl font-bold">23</h3>
               <p>Completed</p>
             </CardContent>
           </Card>
@@ -121,7 +131,7 @@ export default function TeamLeadDashboard() {
                   <div className="p-2">
                     <Button
                       size="sm"
-                      className="w-full"
+                      className="w-full bg-brand-primary"
                       onClick={() => {
                         console.log('Filter applied:', selectedFilter);
                         setOpenFilter(false);
@@ -138,7 +148,7 @@ export default function TeamLeadDashboard() {
           <CardContent className="py-0">
             <div className="rounded-md overflow-hidden">
               <table className="w-full text-sm rounded-md">
-                <thead className="bg-blue-950 text-white">
+                <thead className="bg-brand-primary text-white">
                   <tr>
                     <th className="border-b px-4 py-2 text-left">#</th>
                     <th className="border-b px-4 py-2 text-left">Job Name</th>

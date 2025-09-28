@@ -23,6 +23,7 @@ export default function CreateJobForm() {
   const [newJobId, setNewJobId] = useState<string | null>(null);
   const [jobData, setJobData] = useState({
     jobTitle: '',
+    jobCategory: '',
     startDate: '',
     endDate: '',
     transportAllowance: '',
@@ -30,7 +31,9 @@ export default function CreateJobForm() {
     documentHonor: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setJobData((prevState) => ({ ...prevState, [name]: value }));
   };
@@ -58,13 +61,13 @@ export default function CreateJobForm() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-50 ">
+    <div className="flex flex-col min-h-screen">
       <Header />
 
-      <main className="flex flex-col flex-1 p-4 px-[80px] gap-4 overflow-hidden">
-        <div>
-          <h3 className="text-2xl font-bold">Create Job Form</h3>
-          <p>
+      <main className="flex flex-col flex-1 pt-4 pb-8 px-[80px] gap-4 overflow-hidden">
+        <div className="flex flex-col">
+          <h3 className="text-3xl font-bold text-white">Create Job Form</h3>
+          <p className=" text-base text-neutral-200">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer at
             velit et felis maximus porta. Duis pellentesque in quam ut congue.
           </p>
@@ -75,17 +78,36 @@ export default function CreateJobForm() {
           <CardContent className="flex flex-col p-6">
             <form onSubmit={handleFirstSubmit} className="flex flex-col gap-4">
               <div>
-                <Label htmlFor="jobTitle">Name/Judul Pekerjaan</Label>
+                <Label htmlFor="jobTitle">Nama Pekerjaan</Label>
                 <Input
                   id="jobTitle"
                   name="jobTitle"
                   type="text"
                   required
-                  placeholder="Input your job name"
+                  placeholder="Masukkan nama atau judul pekerjaan"
                   className=""
                   onChange={handleChange}
                   value={jobData.jobTitle}
                 />
+              </div>
+              <div>
+                <Label htmlFor="jobCategory">Jenis Pekerjaan</Label>
+                <select
+                  id="jobCategory"
+                  name="jobCategory"
+                  required
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 disabled:text-muted-fmd:text-sm"
+                  onChange={handleChange}
+                  value={jobData.jobCategory}
+                >
+                  <option value="" disabled>
+                    Pilih jenis pekerjaan
+                  </option>
+                  <option value="Sensus/Survey" className="">
+                    Sensus/Survey
+                  </option>
+                  <option value="Kegiatan Lain">Kegiatan Lain</option>
+                </select>
               </div>
               <div>
                 <Label htmlFor="startDate">Tanggal Mulai</Label>
@@ -114,12 +136,12 @@ export default function CreateJobForm() {
                 />
               </div>
               <div className="">
-                <Label htmlFor="transportAllowance">Uang Transport</Label>
+                <Label htmlFor="transportAllowance">Transport Lokal</Label>
                 <Input
                   id="transportAllowance"
                   name="transportAllowance"
                   type="number"
-                  placeholder="Input Honor"
+                  placeholder="Masukkan transport lokal per hari"
                   className=""
                   onChange={handleChange}
                   value={jobData.transportAllowance}
@@ -131,7 +153,7 @@ export default function CreateJobForm() {
                   id="estimatedHonor"
                   name="estimatedHonor"
                   type="number"
-                  placeholder="Input Honor"
+                  placeholder="Masukkan perkiraan honor mitra (Rp)"
                   className=""
                   onChange={handleChange}
                   value={jobData.estimatedHonor}
@@ -143,20 +165,19 @@ export default function CreateJobForm() {
                   id="documentHonor"
                   name="documentHonor"
                   type="number"
-                  placeholder="Input Honor"
+                  placeholder="Masukkan jumlah honor mitra per dokumen"
                   className=""
                   onChange={handleChange}
                   value={jobData.documentHonor}
                 />
               </div>
               <CardHeader className="px-0 items-end pb-0">
-                <Button type="submit" size="lg" className="bg-blue-950">
+                <Button type="submit" size="lg" className="bg-brand-primary">
                   Submit
                 </Button>
               </CardHeader>
             </form>
           </CardContent>
-          <div className="absolute -bottom-0  w-[100%] h-[5%] bg-blue-950 "></div>
         </Card>
 
         <AlertDialog open={openAlert} onOpenChange={setOpenAlert}>
@@ -178,7 +199,7 @@ export default function CreateJobForm() {
             <AlertDialogFooter>
               <AlertDialogAction
                 onClick={handleNavigateToNextStep}
-                className="bg-blue-950 "
+                className="bg-brand-primary "
               >
                 Ok
               </AlertDialogAction>

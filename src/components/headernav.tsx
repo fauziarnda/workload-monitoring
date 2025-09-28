@@ -36,30 +36,30 @@ export default function Header({ className = '' }: HeaderProps) {
   return (
     <header
       className={cn(
-        'flex justify-between border-b items-center py-4 px-[80px] bg-white',
+        'flex justify-between items-center py-4 px-[80px] ',
         className
       )}
     >
       <div className="flex flex-row gap-2">
-        <Avatar className="w-[32px] h-[32px] rounded-full ">
+        <Avatar className="w-[32px] h-[32px]">
           <AvatarImage src="#" alt="avatar" />
-          <AvatarFallback className="bg-blue-950 text-white font-bold "></AvatarFallback>
+          <AvatarFallback className="text-white bg-white font-bold "></AvatarFallback>
         </Avatar>
-        <h1 className="text-2xl font-bold text-blue-950">LOGO</h1>
+        <h1 className="text-2xl font-bold text-white italic">LOGO</h1>
       </div>
       <div className="flex flex-row gap-2 items-center">
-        <p className="text-base p-2 text-neutral-400">
+        <p className="text-base font-light p-2 text-white">
           Today, 09 September 2025{' '}
         </p>
-        <div className="flex gap-3 items-center rounded-none pl-4 border-l-2 shadow-none cursor-pointer ">
-          <Avatar className="w-[32px] h-[32px] rounded-full ">
+        <div className="flex gap-3 items-center rounded-none pl-4 border-l-2 border-slate-200 shadow-none cursor-pointer ">
+          <Avatar className="w-[32px] h-[32px] rounded-full">
             <AvatarImage src="#" alt="avatar" />
-            <AvatarFallback className="bg-blue-950 text-white ">
-              TS
+            <AvatarFallback className="bg-brand-primary text-white leading-none">
+              J
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <p className="truncate font-medium text-base ">
+            <p className="truncate font-medium text-base text-white ">
               {users[0].username}
             </p>
           </div>
