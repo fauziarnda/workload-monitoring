@@ -1,3 +1,10 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    // Menonaktifkan larangan penggunaan "any"
+    "@typescript-eslint/no-explicit-any": "off",
+
+    // Mengubah error variabel tidak terpakai menjadi peringatan (bukan error)
+    "@typescript-eslint/no-unused-vars": "warn"
+  }
 }

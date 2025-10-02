@@ -20,7 +20,7 @@ interface OrganikEmployee {
 
 interface MitraEmployee {
   id: string;
-  nama: string;
+  name: string;
 }
 
 interface SelectedEmployees {
@@ -34,16 +34,21 @@ export default function FinalizationPage() {
     mitra: [],
   });
   const [formData, setFormData] = useState<{
-    jobTitle: string;
-    startDate: string;
-    endDate: string;
-    transportAllowance: string;
-    estimatedHonor: string;
-    documentHonor: string;
+    jobTitle: '';
+    jobCategory: '';
+    startDate: '';
+    endDate: '';
+    transportAllowance: '';
+    estimatedHonor: '';
+    documentHonor: '';
   } | null>(null);
 
   useEffect(() => {
     const storedEmp = localStorage.getItem('selectedEmployees');
+    console.log('Raw storedEmp:', storedEmp);
+    if (storedEmp) {
+      console.log('Parsed storedEmp:', JSON.parse(storedEmp));
+    }
     if (storedEmp) {
       setEmployees(JSON.parse(storedEmp));
     }
@@ -81,6 +86,16 @@ export default function FinalizationPage() {
                       type="text"
                       disabled
                       value={formData.jobTitle}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="jobCategory">Tipe Pekerjaan</Label>
+                    <Input
+                      id="jobCategory"
+                      name="jobCategory"
+                      type="text"
+                      disabled
+                      value={formData.jobCategory}
                     />
                   </div>
                   <div>
@@ -155,11 +170,10 @@ export default function FinalizationPage() {
                       <CardTitle className="">Pegawai Mitra :</CardTitle>
                     </CardHeader>
                     <CardContent className="px-4">
-                      {/* 🔹 Bagian Organik */}
                       <div>
                         <ul className="list-disc ml-5 ">
                           {employees.mitra.map((emp) => (
-                            <li key={emp.id}>{emp.nama}</li>
+                            <li key={emp.id}>{emp.name}</li>
                           ))}
                         </ul>
                       </div>

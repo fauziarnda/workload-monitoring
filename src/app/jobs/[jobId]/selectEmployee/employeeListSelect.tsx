@@ -1,6 +1,5 @@
 'use client';
 
-import { organicEmployees } from '@/dummyData/organicEmp';
 import { mitraColumns, mitraEmployeesData } from '@/dummyData/mitraEmp';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
@@ -34,11 +33,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useParams, useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
+import { OrganikType, MitraType } from '@/types/employee';
+
+const PAGE_SIZE = 50;
+
+function getNestedValue(obj: any, path: string): any {
+  if (!path) return undefined;
+
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
 
 export default function EmployeeListSelect() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const { jobId } = useParams();
-  const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<number[]>([]);
   const [openFilter, setOpenFilter] = useState(false);
   const [selectedView, setSelectedView] = useState('organik');
   const [selectedEmp, setSelectedEmp] = useState<string[]>([]);
@@ -46,13 +56,88 @@ export default function EmployeeListSelect() {
     {}
   );
 
+  const [selectedDetails, setSelectedDetails] = useState<MitraType | null>(
+    null
+  );
+
+  const [organicEmployees, setOrganicEmployees] = useState<OrganikType[]>([]);
+  const [mitraEmployees, setMitraEmployees] = useState<MitraType[]>([]);
+  const [filterExperience, setFilterExperience] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalMitra, setTotalMitra] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedView === 'organik') {
+        if (organicEmployees.length === 0) {
+          const { data, error } = await supabase
+            .from('employees')
+            .select(
+              `
+                *,
+                employee_organik_details(*),
+                organik_work_history(*)
+              `
+            )
+            .eq('employee_type', 'Organik');
+
+          if (error) throw error;
+          setOrganicEmployees(data || []);
+        }
+      } else if (selectedView === 'mitra') {
+        if (totalMitra === 0) {
+          const { count, error: countError } = await supabase
+            .from('employees')
+            .select('*', { count: 'exact', head: true })
+            .eq('employee_type', 'Mitra');
+          if (countError) throw countError;
+          setTotalMitra(count || 0);
+        }
+
+        const from = currentPage * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+
+        const { data, error } = await supabase
+          .from('employees')
+          .select(
+            `
+              *,
+              employee_mitra_details(*),
+              mitra_experiences(*, experience_types(*))
+            `
+          )
+          .eq('employee_type', 'Mitra')
+          .range(from, to);
+
+        if (error) throw error;
+        setMitraEmployees(data || []);
+      }
+    };
+
+    fetchData();
+  }, [selectedView, currentPage]);
+
   const filterOption = ['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'];
+
+  useEffect(() => {
+    const fetchExperience = async () => {
+      const { data, error } = await supabase
+        .from('experience_types')
+        .select('*');
+
+      if (error) throw error;
+      setFilterExperience(data || []);
+    };
+
+    fetchExperience();
+  }, []);
 
   const selectedCount = Object.values(selectedMitra).filter(Boolean).length;
   const selectedEmployee = selectedEmp.length > 0 || selectedCount > 0;
 
   function toggleSelectMitra(id: string) {
     setSelectedMitra((prev) => ({ ...prev, [id]: !prev[id] }));
+    console.log(selectedMitra);
   }
 
   const toggleSelect = (id: string) => {
@@ -61,15 +146,23 @@ export default function EmployeeListSelect() {
     );
   };
 
+  const handleSeeDetails = (empId: string | number) => {
+    const employee = mitraEmployees.find((emp) => emp.id === empId);
+    setSelectedDetails(employee ?? null);
+  };
+
   const handleSubmit = () => {
     // ambil data organik & mitra yang kepilih
     const selectedOrganik = organicEmployees.filter((emp) =>
       selectedEmp.includes(emp.id)
     );
 
-    const selectedMitraList = mitraEmployeesData.filter(
+    const selectedMitraList = mitraEmployees.filter(
       (emp) => selectedMitra[emp.id]
     );
+
+    console.log('Selected organik', selectedOrganik);
+    console.log('Selected mitra', selectedMitraList);
 
     // simpan ke localStorage
     localStorage.setItem(
@@ -94,61 +187,61 @@ export default function EmployeeListSelect() {
         </div>
 
         <div className="flex flex-row gap-2 items-center">
-          <DropdownMenu
-            open={openFilter}
-            onOpenChange={(o) => {
-              setOpenFilter(o);
-              if (!o) {
-                console.log('Filter applied:', selectedFilter);
-              }
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-10 border-none rounded-md bg-brand-primary text-white"
-              >
-                Filter by experience
-                <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuLabel>Experience</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {filterOption.map((option) => (
-                <DropdownMenuCheckboxItem
-                  key={option}
-                  checked={selectedFilter.includes(option)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedFilter([...selectedFilter, option]);
-                    } else {
-                      setSelectedFilter(
-                        selectedFilter.filter((o) => o !== option)
-                      );
-                    }
-                  }}
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  {option}
-                </DropdownMenuCheckboxItem>
-              ))}
-
-              <DropdownMenuSeparator />
-              <div className="p-2">
+          {selectedView === 'mitra' && (
+            <DropdownMenu
+              open={openFilter}
+              onOpenChange={(o) => {
+                setOpenFilter(o);
+                if (!o) {
+                  console.log('Filter applied:', selectedFilter);
+                }
+              }}
+            >
+              <DropdownMenuTrigger asChild>
                 <Button
-                  size="sm"
-                  className="w-full bg-blue-950"
-                  onClick={() => {
-                    console.log('Filter applied:', selectedFilter);
-                    setOpenFilter(false);
-                  }}
+                  variant="outline"
+                  className="h-10 border-none rounded-md bg-brand-primary text-white"
                 >
-                  Apply
+                  Filter by experience
+                  <ChevronDown />
                 </Button>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuLabel>Experience</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {filterExperience.map((exp) => (
+                  <DropdownMenuCheckboxItem
+                    key={exp.id}
+                    checked={selectedFilter.includes(exp.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedFilter((prev) =>
+                        checked
+                          ? [...selectedFilter, exp.id]
+                          : prev.filter((id) => id !== exp.id)
+                      );
+                    }}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    {exp.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+
+                <DropdownMenuSeparator />
+                <div className="p-2">
+                  <Button
+                    size="sm"
+                    className="w-full bg-blue-950"
+                    onClick={() => {
+                      console.log('Filter applied:', selectedFilter);
+                      setOpenFilter(false);
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <ToggleGroup
             className="border-2 border-brand-primary bg-white h-10 rounded-md overflow-hidden items-center "
@@ -212,12 +305,14 @@ export default function EmployeeListSelect() {
                       <div className="flex flex-col gap-2">
                         <div>
                           <h3 className="text-lg font-semibold">{emp.name}</h3>
-                          <p className="text-sm text-gray-500">{emp.email}</p>
+                          <p className="text-sm text-gray-500">
+                            {emp.employee_type}
+                          </p>
                         </div>
 
                         <div className="flex gap-2">
                           <p className="text-xs text-white py-[2px] px-2 rounded-md bg-blue-400 w-fit">
-                            {emp.department}
+                            {emp.employee_organik_details?.department}
                           </p>
                           <p
                             className={`text-xs text-white py-[2px] px-2 rounded-md bg-green-500 w-fit ${
@@ -256,97 +351,140 @@ export default function EmployeeListSelect() {
                 </TableHeader>
 
                 <TableBody>
-                  {mitraEmployeesData.map((row) => {
-                    const isSelected = !!selectedMitra[row.id];
-                    return (
-                      <TableRow
-                        key={row.id}
-                        className={`cursor-pointer hover:bg-muted/50 transition-colors ${
-                          isSelected ? 'bg-muted/70' : ''
-                        }`}
-                        onClick={() => toggleSelectMitra(row.id)}
-                        role="row"
-                        aria-selected={isSelected}
-                      >
-                        <TableCell>
-                          <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={() => toggleSelectMitra(row.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            aria-label={`Pilih ${row.id}`}
-                          />
-                        </TableCell>
-                        {mitraColumns.map((col) => (
-                          <TableCell key={String(col.key)}>
-                            {col.key === 'img' ? (
-                              <Avatar>
-                                <AvatarImage
-                                  src={String(row[col.key])}
-                                  alt={row.nama}
-                                />
-                                <AvatarFallback className="bg-neutral-300">
-                                  {row.nama[0]}
-                                </AvatarFallback>
-                              </Avatar>
-                            ) : (
-                              String(row[col.key])
-                            )}
+                  {mitraEmployees
+                    .filter((row) => {
+                      if (selectedFilter.length === 0) return true;
+
+                      return row.mitra_experiences?.some((exp: any) =>
+                        selectedFilter.includes(exp.experience_type_id)
+                      );
+                    })
+                    .map((row) => {
+                      const isSelected = !!selectedMitra[row.id];
+
+                      return (
+                        <TableRow
+                          key={row.id}
+                          className={`cursor-pointer hover:bg-muted/50 transition-colors ${
+                            isSelected ? 'bg-muted/70' : ''
+                          }`}
+                          role="row"
+                          aria-selected={isSelected}
+                        >
+                          <TableCell onClick={() => toggleSelectMitra(row.id)}>
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelectMitra(row.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              aria-label={`Pilih ${row.id}`}
+                            />
                           </TableCell>
-                        ))}
 
-                        <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                                variant="link"
-                                className="p-0"
-                              >
-                                See Detail
-                              </Button>
-                            </DialogTrigger>
+                          {mitraColumns.map((col) => (
+                            <TableCell key={col.key}>
+                              {col.cell
+                                ? col.cell({ row })
+                                : (() => {
+                                    const cellValue = getNestedValue(
+                                      row,
+                                      col.key
+                                    );
+                                    if (col.key === 'img_url') {
+                                      return (
+                                        <Avatar>
+                                          <AvatarImage
+                                            src={cellValue || ''}
+                                            alt={row.name}
+                                          />
+                                          <AvatarFallback>
+                                            {row.name ? row.name[0] : '?'}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                      );
+                                    }
+                                    return String(cellValue || '-');
+                                  })()}
+                            </TableCell>
+                          ))}
 
-                            <DialogContent className="flex flex-col sm:max-w-lg p-2">
-                              <DialogHeader className="flex flex-col justify-center items-center ">
-                                <DialogTitle>Personal Informastion</DialogTitle>
-                                <DialogDescription>
-                                  Detail dari employee
-                                </DialogDescription>
-                              </DialogHeader>
-                              <Avatar className="flex flex-col max-w-32 w-full h-32 rounded-md border justify-center items-center self-center">
-                                <AvatarImage src="#" alt="name" />
-                                <AvatarFallback className="rounded-md">
-                                  A
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col gap-4 p-4 ">
-                                <div className="mt-2 space-y-2">
-                                  <p>NAMA : JOHN DOE</p>
-                                  <p>SOBAT ID : 012345678</p>
-                                  <p>USIA : 25</p>
-                                  <p>TANGGAL LAHIR : 01 JANUARI 1999</p>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  onClick={() => handleSeeDetails(row.id)}
+                                  variant="link"
+                                  className="p-0"
+                                >
+                                  See Detail
+                                </Button>
+                              </DialogTrigger>
 
-                                  <p>DAERAH ASAL : SUMBERSARI, LOWOKWARU</p>
-                                  <p>PENDIDIKAN TERAKHIR : S1</p>
-                                  <p className="flex gap-1">
-                                    PENGALAMAN :{' '}
-                                    <span className="px-2 py-0 bg-brand-secondary rounded-full">
-                                      SAKERNAS
-                                    </span>
-                                    <span className="px-2 py-0 bg-brand-secondary rounded-full">
-                                      SAKERNAS
-                                    </span>
-                                  </p>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                              {selectedDetails && (
+                                <DialogContent className="flex flex-col sm:max-w-lg p-2">
+                                  <DialogHeader className="flex flex-col justify-center items-center ">
+                                    <DialogTitle>
+                                      Personal Informastion
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Detail dari employee
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <Avatar className="flex flex-col max-w-32 w-full h-32 rounded-md border justify-center items-center self-center">
+                                    <AvatarImage src="#" alt="name" />
+                                    <AvatarFallback className="rounded-md">
+                                      A
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col gap-4 p-4 ">
+                                    <div className="mt-2 space-y-2">
+                                      <p>{selectedDetails.name}</p>
+                                      <p>
+                                        {
+                                          selectedDetails.employee_mitra_details
+                                            ?.date_of_birth
+                                        }
+                                      </p>
+
+                                      <p>
+                                        {
+                                          selectedDetails.employee_mitra_details
+                                            ?.village
+                                        }
+                                      </p>
+                                      <p>
+                                        {
+                                          selectedDetails.employee_mitra_details
+                                            ?.sub_district
+                                        }
+                                      </p>
+                                      <p>
+                                        {
+                                          selectedDetails.employee_mitra_details
+                                            ?.last_education
+                                        }
+                                      </p>
+                                      <p>
+                                        {selectedDetails.mitra_experiences.map(
+                                          (exp: any) => (
+                                            <span
+                                              key={exp.id}
+                                              className="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full"
+                                            >
+                                              {exp.experience_types?.name ||
+                                                'N/A'}
+                                            </span>
+                                          )
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              )}
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             </CardContent>
@@ -404,10 +542,10 @@ export default function EmployeeListSelect() {
                 <CardContent className="px-4">
                   {selectedCount > 0 ? (
                     <ul className="list-disc ml-5">
-                      {mitraEmployeesData
-                        .filter((emp) => selectedMitra[emp.id]) // ✅ cek dari object
+                      {mitraEmployees
+                        .filter((emp) => selectedMitra[emp.id])
                         .map((emp) => (
-                          <li key={emp.id}>{emp.nama}</li>
+                          <li key={emp.id}>{emp.name}</li>
                         ))}
                     </ul>
                   ) : (
