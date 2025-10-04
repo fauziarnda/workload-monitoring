@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import JobsTable from './jobsTable';
 
 export default function TeamLeadDashboard() {
   const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
@@ -101,7 +102,7 @@ export default function TeamLeadDashboard() {
               >
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Filter by experience
+                    Filter by status
                     <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
@@ -146,7 +147,7 @@ export default function TeamLeadDashboard() {
           </CardHeader>
 
           <CardContent className="py-0">
-            <div className="rounded-md overflow-hidden">
+            {/* <div className="rounded-md overflow-hidden">
               <table className="w-full text-sm rounded-md">
                 <thead className="bg-brand-primary text-white">
                   <tr>
@@ -207,7 +208,8 @@ export default function TeamLeadDashboard() {
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </div> */}
+            <JobsTable />
           </CardContent>
         </Card>
       </main>

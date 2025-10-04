@@ -145,6 +145,92 @@ export type Database = {
         }
         Relationships: []
       }
+      job_assignments: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          job_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_assignments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          estimated_honorarium: number | null
+          honor_document_basis: number | null
+          id: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["job_status"] | null
+          title: string
+          transport_allowance: number | null
+          type: Database["public"]["Enums"]["job_type"] | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          estimated_honorarium?: number | null
+          honor_document_basis?: number | null
+          id?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          title: string
+          transport_allowance?: number | null
+          type?: Database["public"]["Enums"]["job_type"] | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          estimated_honorarium?: number | null
+          honor_document_basis?: number | null
+          id?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          title?: string
+          transport_allowance?: number | null
+          type?: Database["public"]["Enums"]["job_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mitra_experiences: {
         Row: {
           employee_id: string
@@ -226,6 +312,8 @@ export type Database = {
     Enums: {
       employee_status: "Available" | "Unavailable" | "On Project"
       employee_type: "Organik" | "Mitra"
+      job_status: "DRAFT" | "FINALIZED" | "ONGOING" | "COMPLETED"
+      job_type: "Sensus/Survey" | "Kegiatan Lain"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -358,6 +446,8 @@ export const Constants = {
     Enums: {
       employee_status: ["Available", "Unavailable", "On Project"],
       employee_type: ["Organik", "Mitra"],
+      job_status: ["DRAFT", "FINALIZED", "ONGOING", "COMPLETED"],
+      job_type: ["Sensus/Survey", "Kegiatan Lain"],
     },
   },
 } as const

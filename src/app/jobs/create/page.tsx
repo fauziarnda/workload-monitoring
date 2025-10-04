@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/headernav';
+import { supabase } from '@/lib/supabase/client';
+import { Database } from '@/types/supabase';
 
 export default function CreateJobForm() {
   const router = useRouter();
@@ -23,7 +25,7 @@ export default function CreateJobForm() {
   const [newJobId, setNewJobId] = useState<string | null>(null);
   const [jobData, setJobData] = useState({
     jobTitle: '',
-    jobCategory: '',
+    jobType: '',
     startDate: '',
     endDate: '',
     transportAllowance: '',
@@ -38,17 +40,53 @@ export default function CreateJobForm() {
     setJobData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleFirstSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFirstSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const dummyJobId = `dummy-job-${Date.now()}`;
-    console.log('Generated dummy ID: ', dummyJobId);
 
-    const isSuccess = true;
-    if (isSuccess) {
-      localStorage.setItem('jobData', JSON.stringify(jobData));
-      setNewJobId(dummyJobId);
-      setOpenAlert(true);
+    const formData = new FormData(e.currentTarget);
+    const raw = Object.fromEntries(formData);
+
+    type JobInsert = Database['public']['Tables']['jobs']['Insert'];
+
+    const payload: JobInsert = {
+      title: String(raw.jobTitle),
+      type: raw.jobType as Database['public']['Enums']['job_type'],
+      start_date: String(raw.startDate),
+      end_date: String(raw.endDate),
+      transport_allowance: Number(raw.transportAllowance),
+      estimated_honorarium: Number(raw.estimatedHonor),
+      honor_document_basis: Number(raw.documentHonor),
+      status: 'DRAFT',
+      created_by: null,
+    };
+
+    console.log(payload);
+
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .insert(payload)
+        .select();
+
+      if (error) {
+        console.error('Error creating job:', error);
+        throw error;
+      }
+
+      console.log('Job created successfully:', data);
+    } catch (error) {
+      console.error('An unexpected error occurred:', error);
     }
+
+    // const dummyJobId = `dummy-job-${Date.now()}`;
+    // console.log('Generated dummy ID: ', dummyJobId);
+
+    // const isSuccess = true;
+    // if (isSuccess) {
+    //   localStorage.setItem('jobData', JSON.stringify(jobData));
+    //   setNewJobId(dummyJobId);
+    //   setOpenAlert(true);
+    // }
   };
 
   const handleNavigateToNextStep = () => {
@@ -91,14 +129,14 @@ export default function CreateJobForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="jobCategory">Jenis Pekerjaan</Label>
+                <Label htmlFor="jobType">Jenis Pekerjaan</Label>
                 <select
-                  id="jobCategory"
-                  name="jobCategory"
+                  id="jobType"
+                  name="jobType"
                   required
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 disabled:text-muted-fmd:text-sm"
                   onChange={handleChange}
-                  value={jobData.jobCategory}
+                  value={jobData.jobType}
                 >
                   <option value="" disabled>
                     Pilih jenis pekerjaan
