@@ -75,12 +75,11 @@ export default function CreateJobForm() {
       }
 
       console.log('Job created successfully:', data);
+      setNewJobId(data.id);
       setOpenAlert(true);
 
-      setNewJobId(data.id);
-
       setTimeout(() => {
-        router.push(`/jobs/${newJobId}/selectEmployee`);
+        router.push(`/jobs/${data.id}/selectEmployee`);
       }, 2000);
     } catch (error) {
       console.error('An unexpected error occurred:', error);
