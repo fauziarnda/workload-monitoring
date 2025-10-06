@@ -66,7 +66,8 @@ export default function CreateJobForm() {
       const { data, error } = await supabase
         .from('jobs')
         .insert(payload)
-        .select();
+        .select()
+        .single();
 
       if (error) {
         console.error('Error creating job:', error);
@@ -74,25 +75,20 @@ export default function CreateJobForm() {
       }
 
       console.log('Job created successfully:', data);
+      setOpenAlert(true);
+
+      setNewJobId(data.id);
+
+      setTimeout(() => {
+        router.push(`/jobs/${newJobId}/selectEmployee`);
+      }, 2000);
     } catch (error) {
       console.error('An unexpected error occurred:', error);
     }
-
-    // const dummyJobId = `dummy-job-${Date.now()}`;
-    // console.log('Generated dummy ID: ', dummyJobId);
-
-    // const isSuccess = true;
-    // if (isSuccess) {
-    //   localStorage.setItem('jobData', JSON.stringify(jobData));
-    //   setNewJobId(dummyJobId);
-    //   setOpenAlert(true);
-    // }
   };
 
   const handleNavigateToNextStep = () => {
-    // Tutup dialog
     setOpenAlert(false);
-    // 3. Gunakan ID yang tersimpan untuk navigasi ke halaman selanjutnya
     if (newJobId) {
       router.push(`/jobs/${newJobId}/selectEmployee`);
     }

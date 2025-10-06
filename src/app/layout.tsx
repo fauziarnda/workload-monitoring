@@ -28,8 +28,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
-        <div className="absolute top-0 w-[100%] h-[40%] bg-gradient-to-l from-cyan-500  to-cyan-900 -z-10 "></div>
-
         {children}
       </body>
     </html>
