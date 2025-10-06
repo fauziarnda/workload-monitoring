@@ -12,6 +12,9 @@ import { Label } from '@/components/ui/label';
 import { useEffect, useState } from 'react';
 import Header from '@/components/headernav';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase/client';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import { Database } from '@/types/supabase';
 
 interface OrganikEmployee {
   id: string;
@@ -23,41 +26,97 @@ interface MitraEmployee {
   name: string;
 }
 
-interface SelectedEmployees {
-  organik: OrganikEmployee[];
+type SelectedEmployees = {
+  organik: OrganikEmployee[]; // Ganti `any` dengan tipe Employee Anda
   mitra: MitraEmployee[];
-}
+};
+
+type JobRow = Database['public']['Tables']['jobs']['Row'];
 
 export default function FinalizationPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { jobId } = useParams();
   const [employees, setEmployees] = useState<SelectedEmployees>({
     organik: [],
     mitra: [],
   });
-  const [formData, setFormData] = useState<{
-    jobTitle: '';
-    jobCategory: '';
-    startDate: '';
-    endDate: '';
-    transportAllowance: '';
-    estimatedHonor: '';
-    documentHonor: '';
-  } | null>(null);
+
+  const [jobData, setJobData] = useState<JobRow | null>(null);
 
   useEffect(() => {
     const storedEmp = localStorage.getItem('selectedEmployees');
-    console.log('Raw storedEmp:', storedEmp);
-    if (storedEmp) {
-      console.log('Parsed storedEmp:', JSON.parse(storedEmp));
-    }
     if (storedEmp) {
       setEmployees(JSON.parse(storedEmp));
     }
-
-    const storedForm = localStorage.getItem('jobData');
-    if (storedForm) {
-      setFormData(JSON.parse(storedForm));
-    }
   }, []);
+
+  useEffect(() => {
+    if (typeof jobId !== 'string') {
+      console.error('Job ID tidak valid atau berupa array:', jobId);
+      return;
+    }
+
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('id', jobId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching job:', error);
+      } else {
+        setJobData(data);
+      }
+    };
+
+    fetchData();
+  }, [jobId]);
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    if (typeof jobId !== 'string') {
+      setError('ID Pekerjaan tidak valid.');
+      setIsLoading(false);
+      return;
+    }
+
+    const allSelectedEmployees = [...employees.organik, ...employees.mitra];
+
+    if (allSelectedEmployees.length === 0) {
+      setError('Tidak ada pegawai yang dipilih untuk disimpan.');
+      setIsLoading(false);
+      return;
+    }
+
+    const payload = allSelectedEmployees.map((employee) => ({
+      job_id: jobId,
+      employee_id: employee.id,
+    }));
+
+    try {
+      const { error: insertError } = await supabase
+        .from('job_assignments')
+        .insert(payload);
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      localStorage.removeItem('selectedEmployees');
+      alert('Pegawai berhasil ditugaskan!'); // Ganti dengan notifikasi yang lebih baik
+      router.push(`/dashboard/teamlead`); // Arahkan ke halaman detail pekerjaan
+    } catch (err: any) {
+      console.error('Gagal menyimpan penugasan pegawai:', err);
+      setError('Terjadi kesalahan saat menyimpan data. Coba lagi.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -73,7 +132,7 @@ export default function FinalizationPage() {
           </p>
         </div>
 
-        {formData && (
+        {jobData && (
           <Card className="relative w-full flex-1 overflow-hidden">
             <CardContent className="flex flex-col p-6 ">
               <div className="flex flex-row w-full">
@@ -85,7 +144,7 @@ export default function FinalizationPage() {
                       name="jobTitle"
                       type="text"
                       disabled
-                      value={formData.jobTitle}
+                      value={jobData.title}
                     />
                   </div>
                   <div>
@@ -95,7 +154,7 @@ export default function FinalizationPage() {
                       name="jobCategory"
                       type="text"
                       disabled
-                      value={formData.jobCategory}
+                      value={jobData.type ?? ''}
                     />
                   </div>
                   <div>
@@ -105,7 +164,7 @@ export default function FinalizationPage() {
                       name="startDate"
                       type="date"
                       disabled
-                      value={formData.startDate}
+                      value={jobData.start_date ?? ''}
                     />
                   </div>
                   <div className="">
@@ -115,7 +174,7 @@ export default function FinalizationPage() {
                       name="endDate"
                       type="date"
                       disabled
-                      value={formData.endDate}
+                      value={jobData.end_date ?? ''}
                     />
                   </div>
                   <div className="">
@@ -125,7 +184,7 @@ export default function FinalizationPage() {
                       name="transportAllowance"
                       type="number"
                       disabled
-                      value={formData.transportAllowance}
+                      value={jobData.transport_allowance ?? ''}
                     />
                   </div>
                   <div className="">
@@ -135,7 +194,7 @@ export default function FinalizationPage() {
                       name="estimatedHonor"
                       type="number"
                       disabled
-                      value={formData.estimatedHonor}
+                      value={jobData.estimated_honorarium ?? ''}
                     />
                   </div>
                   <div className="">
@@ -145,7 +204,7 @@ export default function FinalizationPage() {
                       name="documentHonor"
                       type="number"
                       disabled
-                      value={formData.documentHonor}
+                      value={jobData.honor_document_basis ?? ''}
                     />
                   </div>
                 </div>
@@ -185,16 +244,13 @@ export default function FinalizationPage() {
 
             <CardFooter className="flex flex-col items-end mt-auto">
               <Button
-                onClick={() => {
-                  alert('Final Submit ✅');
-                  localStorage.removeItem('selectedEmployees');
-                  localStorage.removeItem('jobData');
-                }}
+                onClick={handleSubmit}
+                disabled={isLoading}
                 type="submit"
                 size="lg"
                 className="bg-blue-950"
               >
-                Submit
+                {isLoading ? 'Menyimpan...' : 'Submit & Finalisasi'}
               </Button>
             </CardFooter>
           </Card>

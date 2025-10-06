@@ -82,8 +82,6 @@ export default function TeamLeadDashboard() {
           </Card>
         </div>
 
-        {/* table list */}
-
         <Card className="flex flex-col flex-1 overflow-y-auto">
           <CardHeader>
             <div className="flex flex-row justify-between items-center">
@@ -147,68 +145,6 @@ export default function TeamLeadDashboard() {
           </CardHeader>
 
           <CardContent className="py-0">
-            {/* <div className="rounded-md overflow-hidden">
-              <table className="w-full text-sm rounded-md">
-                <thead className="bg-brand-primary text-white">
-                  <tr>
-                    <th className="border-b px-4 py-2 text-left">#</th>
-                    <th className="border-b px-4 py-2 text-left">Job Name</th>
-                    <th className="border-b px-4 py-2 text-left">Status</th>
-                    <th className="border-b px-4 py-2 text-left">Deadline</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border-b px-4 py-2">1</td>
-                    <td className="border-b px-4 py-2">Design Homepage</td>
-                    <td className="border-b px-4 py-2">In Progress</td>
-                    <td className="border-b px-4 py-2">15 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="border-b px-4 py-2">2</td>
-                    <td className="border-b px-4 py-2">Fix Bug API</td>
-                    <td className="border-b px-4 py-2">Completed</td>
-                    <td className="border-b px-4 py-2">10 Sept 2025</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div> */}
             <JobsTable />
           </CardContent>
         </Card>

@@ -11,8 +11,10 @@ import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/headernav';
@@ -76,7 +78,13 @@ export default function CreateJobForm() {
 
       console.log('Job created successfully:', data);
       setNewJobId(data.id);
-      setOpenAlert(true);
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+
+      setTimeout(() => {
+        setOpenAlert(true);
+      }, 0);
 
       setTimeout(() => {
         router.push(`/jobs/${data.id}/selectEmployee`);
@@ -106,7 +114,6 @@ export default function CreateJobForm() {
           </p>
         </div>
 
-        {/* container form isi sisa tinggi */}
         <Card className="relative w-full flex-1 overflow-hidden">
           <CardContent className="flex flex-col p-6">
             <form onSubmit={handleFirstSubmit} className="flex flex-col gap-4">
@@ -219,13 +226,13 @@ export default function CreateJobForm() {
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2 items-center ">
                   <CheckCircle className="text-brand-primary w-6 h-6 text-blue-950" />
-                  <h4 className="text-2xl font-bold text-brand-primary text-blue-950">
+                  <AlertDialogTitle className="text-2xl font-bold text-brand-primary text-blue-950">
                     Success
-                  </h4>
+                  </AlertDialogTitle>
                 </div>
-                <p className="text-base font-regular text-brand-blackd">
+                <AlertDialogDescription className="text-base font-regular text-brand-black">
                   Form telah berhasil di submit
-                </p>
+                </AlertDialogDescription>
               </div>
             </AlertDialogHeader>
 
@@ -234,7 +241,7 @@ export default function CreateJobForm() {
                 onClick={handleNavigateToNextStep}
                 className="bg-brand-primary "
               >
-                Ok
+                Continue
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

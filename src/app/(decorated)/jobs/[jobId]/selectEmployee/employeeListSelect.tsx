@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ReactEventHandler, useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
@@ -151,12 +151,10 @@ export default function EmployeeListSelect() {
     setSelectedDetails(employee ?? null);
   };
 
-  const handleSubmit = () => {
-    // ambil data organik & mitra yang kepilih
+  const handleSubmit = async () => {
     const selectedOrganik = organicEmployees.filter((emp) =>
       selectedEmp.includes(emp.id)
     );
-
     const selectedMitraList = mitraEmployees.filter(
       (emp) => selectedMitra[emp.id]
     );
@@ -164,13 +162,11 @@ export default function EmployeeListSelect() {
     console.log('Selected organik', selectedOrganik);
     console.log('Selected mitra', selectedMitraList);
 
-    // simpan ke localStorage
     localStorage.setItem(
       'selectedEmployees',
       JSON.stringify({ organik: selectedOrganik, mitra: selectedMitraList })
     );
 
-    // redirect ke halaman finalisasi
     router.push(`/jobs/${jobId}/finalization`);
   };
 
