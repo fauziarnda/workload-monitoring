@@ -27,7 +27,7 @@ interface MitraEmployee {
 }
 
 type SelectedEmployees = {
-  organik: OrganikEmployee[]; // Ganti `any` dengan tipe Employee Anda
+  organik: OrganikEmployee[];
   mitra: MitraEmployee[];
 };
 

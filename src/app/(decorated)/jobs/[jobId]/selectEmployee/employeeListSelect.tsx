@@ -6,8 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronDown } from 'lucide-react';
-import { ReactEventHandler, useEffect, useState } from 'react';
+import { ChevronDown, Key } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
@@ -35,6 +35,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { OrganikType, MitraType } from '@/types/employee';
+import React from 'react';
 
 const PAGE_SIZE = 50;
 
@@ -43,6 +44,19 @@ function getNestedValue(obj: any, path: string): any {
 
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
+
+const attributeLabels: Record<string, string> = {
+  title: 'Nama Pekerjaan',
+  type: 'Tipe Pekerjaan',
+  status: 'Status',
+  start_date: 'Tanggal Mulai',
+  end_date: 'Tanggal Selesai',
+  estimated_honorarium: 'Estimasi Honorarium',
+  transport_allowance: 'Tunjangan Transportasi',
+  honor_document_basis: 'Dasar Dokumen Honor',
+};
+
+const hiddenAttributes = ['id', 'created_at', 'created_by', 'img_url'];
 
 export default function EmployeeListSelect() {
   const router = useRouter();
@@ -116,8 +130,6 @@ export default function EmployeeListSelect() {
 
     fetchData();
   }, [selectedView, currentPage]);
-
-  const filterOption = ['SUSENAS', 'SAKERNAS', 'VHTL', 'KEPKA'];
 
   useEffect(() => {
     const fetchExperience = async () => {
@@ -422,57 +434,87 @@ export default function EmployeeListSelect() {
                                       Personal Informastion
                                     </DialogTitle>
                                     <DialogDescription>
-                                      Detail dari employee
+                                      Detail dari profil mitra
                                     </DialogDescription>
                                   </DialogHeader>
-                                  <Avatar className="flex flex-col max-w-32 w-full h-32 rounded-md border justify-center items-center self-center">
-                                    <AvatarImage src="#" alt="name" />
-                                    <AvatarFallback className="rounded-md">
-                                      A
+                                  <Avatar className="w-28 h-28 rounded-md border self-center my-4">
+                                    <AvatarImage
+                                      src={selectedDetails.img_url || '#'}
+                                      alt={selectedDetails.name}
+                                    />
+                                    <AvatarFallback className="rounded-md text-2xl">
+                                      {selectedDetails.name
+                                        ?.charAt(0)
+                                        .toUpperCase()}
                                     </AvatarFallback>
                                   </Avatar>
-                                  <div className="flex flex-col gap-4 p-4 ">
-                                    <div className="mt-2 space-y-2">
-                                      <p>{selectedDetails.name}</p>
-                                      <p>
-                                        {
-                                          selectedDetails.employee_mitra_details
-                                            ?.date_of_birth
-                                        }
-                                      </p>
 
-                                      <p>
-                                        {
-                                          selectedDetails.employee_mitra_details
-                                            ?.village
-                                        }
-                                      </p>
-                                      <p>
-                                        {
-                                          selectedDetails.employee_mitra_details
-                                            ?.sub_district
-                                        }
-                                      </p>
-                                      <p>
-                                        {
-                                          selectedDetails.employee_mitra_details
-                                            ?.last_education
-                                        }
-                                      </p>
-                                      <p>
-                                        {selectedDetails.mitra_experiences.map(
-                                          (exp: any) => (
-                                            <span
-                                              key={exp.id}
-                                              className="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full"
-                                            >
-                                              {exp.experience_types?.name ||
-                                                'N/A'}
-                                            </span>
-                                          )
-                                        )}
-                                      </p>
-                                    </div>
+                                  <div className="grid grid-cols-[180px_1fr] items-center gap-x-4 gap-y-2 p-4 mb-4 text-base">
+                                    <p className="font-semibold text-gray-600">
+                                      Nama
+                                    </p>
+                                    <p>: {selectedDetails.name || '-'}</p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Tipe
+                                    </p>
+                                    <p>
+                                      : {selectedDetails.employee_type || '-'}
+                                    </p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Tanggal Lahir
+                                    </p>
+                                    <p>
+                                      :{' '}
+                                      {selectedDetails.employee_mitra_details
+                                        ?.date_of_birth || '-'}
+                                    </p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Pendidikan
+                                    </p>
+                                    <p>
+                                      :{' '}
+                                      {selectedDetails.employee_mitra_details
+                                        ?.last_education || '-'}
+                                    </p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Kecamatan
+                                    </p>
+                                    <p>
+                                      :{' '}
+                                      {selectedDetails.employee_mitra_details
+                                        ?.village || '-'}
+                                    </p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Desa
+                                    </p>
+                                    <p>
+                                      :{' '}
+                                      {selectedDetails.employee_mitra_details
+                                        ?.sub_district || '-'}
+                                    </p>
+
+                                    <p className="font-semibold text-gray-600">
+                                      Pengalaman Mitra
+                                    </p>
+                                    <p>
+                                      :{' '}
+                                      {selectedDetails.mitra_experiences.map(
+                                        (exp: any) => (
+                                          <span
+                                            key={exp.id}
+                                            className="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full"
+                                          >
+                                            {exp.experience_types?.name ||
+                                              'N/A'}
+                                          </span>
+                                        )
+                                      )}
+                                    </p>
                                   </div>
                                 </DialogContent>
                               )}
