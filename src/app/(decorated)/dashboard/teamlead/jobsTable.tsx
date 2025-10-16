@@ -110,7 +110,7 @@ export default function JobsTable() {
   return (
     <Table className="overflow-hidden rounded-md">
       <TableHeader>
-        <TableRow className="bg-blue-950 hover:!bg-none text-white">
+        <TableRow className="bg-brand-primary bhover:!bg-none text-white">
           <TableHead className="text-white font-semibold">No</TableHead>
           {jobsColumn.map((col) => (
             <TableHead key={col.key} className="text-white font-semibold">

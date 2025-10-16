@@ -54,9 +54,6 @@ export default function TeamLeadDashboard() {
 
         <div className="flex flex-row gap-4">
           <Card className="w-full h-32 relative overflow-hidden border-none">
-            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
-            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
-
             <CardContent className=" flex flex-col px-5 py-4 ">
               <h3 className="text-4xl font-bold">23</h3>
               <p>Total Job</p>
@@ -64,8 +61,6 @@ export default function TeamLeadDashboard() {
           </Card>
 
           <Card className="w-full h-32 relative overflow-hidden border-none ">
-            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
-            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
             <CardContent className="flex flex-col px-5 py-4">
               <h3 className="text-4xl font-bold">23</h3>
               <p>On Going Job</p>
@@ -73,8 +68,6 @@ export default function TeamLeadDashboard() {
           </Card>
 
           <Card className="w-full h-32 relative overflow-hidden border-none">
-            <div className="absolute w-[8%] h-[80%] bg-brand-secondary right-4 bottom-0 rounded-t-full"></div>
-            <div className="absolute w-[8%] h-[50%] bg-brand-primary right-4 bottom-0 rounded-t-full -translate-x-14"></div>
             <CardContent className="flex flex-col px-5 py-4">
               <h3 className="text-4xl font-bold">23</h3>
               <p>Completed</p>

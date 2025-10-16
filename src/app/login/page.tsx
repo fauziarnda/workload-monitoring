@@ -5,10 +5,10 @@ import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-cyan-400 via-cyan-600 to-blue-700 p-6">
-      <Card className="w-full max-w-md shadow-2xl rounded-2xl border-0 bg-white/90 backdrop-blur-md">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-bl from-cyan-500 to-cyan-900">
+      <Card className="w-full max-w-md p-3 bg-white">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-4xl font-extrabold text-cyan-800 ">
+          <CardTitle className="text-4xl font-bold text-cyan-800 ">
             Selamat Datang
           </CardTitle>
           <p className="text-sm text-gray-500">Silakan masuk ke akun Anda</p>

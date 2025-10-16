@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model employee_mitra_details {
+  employee_id    String    @id @db.Uuid
+  date_of_birth  DateTime? @db.Date
+  last_education String?
+  village        String?
+  sub_district   String?
+  employees      employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model employee_organik_details {
+  employee_id String    @id @db.Uuid
+  department  String?
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model employees {
+  id                       String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                     String
+  img_url                  String?
+  employee_type            employee_type
+  status                   employee_status?          @default(Available)
+  created_at               DateTime?                 @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime?                 @default(now()) @db.Timestamptz(6)
+  employee_mitra_details   employee_mitra_details?
+  employee_organik_details employee_organik_details?
+  job_assignments          job_assignments[]
+  jobs                     jobs[]
+  mitra_experiences        mitra_experiences[]
+  organik_work_history     organik_work_history[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model experience_types {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique @db.VarChar(100)
+  description       String?
+  created_at        DateTime?           @default(now()) @db.Timestamptz(6)
+  mitra_experiences mitra_experiences[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model job_assignments {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  job_id      String    @db.Uuid
+  employee_id String    @db.Uuid
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  jobs        jobs      @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model jobs {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at           DateTime          @default(now()) @db.Timestamptz(6)
+  title                String
+  type                 job_type?
+  start_date           DateTime?         @db.Date
+  end_date             DateTime?         @db.Date
+  transport_allowance  Decimal?          @db.Decimal
+  estimated_honorarium Decimal?          @db.Decimal
+  honor_document_basis Decimal?          @db.Decimal
+  status               job_status?       @default(DRAFT)
+  created_by           String?           @db.Uuid
+  job_assignments      job_assignments[]
+  employees            employees?        @relation(fields: [created_by], references: [id], onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model mitra_experiences {
+  id                 BigInt           @id @default(autoincrement())
+  employee_id        String           @db.Uuid
+  experience_type_id Int
+  year               Int?
+  employees          employees        @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  experience_types   experience_types @relation(fields: [experience_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model organik_work_history {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  job_title   String
+  company     String
+  start_date  DateTime? @db.Date
+  end_date    DateTime? @db.Date
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum employee_status {
+  Available
+  Unavailable
+  On_Project  @map("On Project")
+}
+
+enum employee_type {
+  Organik
+  Mitra
+}
+
+enum job_status {
+  DRAFT
+  FINALIZED
+  ONGOING
+  COMPLETED
+}
+
+enum job_type {
+  Sensus_Survey @map("Sensus/Survey")
+  Kegiatan_Lain @map("Kegiatan Lain")
+}
