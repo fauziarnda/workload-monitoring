@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 export default function LoginPage() {
   return (
@@ -64,10 +65,13 @@ export default function LoginPage() {
             </Button>
 
             <p className="text-center text-sm text-gray-600">
-              Belum punya akun?{' '}
-              <a href="#" className="text-cyan-700 font-medium hover:underline">
+              Belum mempunyai akun?{' '}
+              <Link
+                href="/register"
+                className="text-cyan-700 font-medium hover:underline"
+              >
                 Daftar di sini
-              </a>
+              </Link>
             </p>
           </form>
         </CardContent>

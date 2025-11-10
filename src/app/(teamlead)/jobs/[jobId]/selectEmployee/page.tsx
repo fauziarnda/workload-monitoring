@@ -1,6 +1,5 @@
-import EmployeeListSelect from '@/app/(decorated)/jobs/[jobId]/selectEmployee/employeeListSelect';
+import EmployeeListSelect from '@/app/(teamlead)/jobs/[jobId]/selectEmployee/employeeListSelect';
 import Header from '@/components/headernav';
-import { Database } from '@/types/supabase';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
